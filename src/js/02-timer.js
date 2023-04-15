@@ -9,8 +9,6 @@ const dateHoursEl = document.querySelector('[data-hours]')
 const dataMinutesEl = document.querySelector('[data-minutes]');
 const dataSecondsEl = document.querySelector('[data-seconds]');
 
-
-
 buttomStartEl.disabled = true;
 
 flatpickr(dateImportEl, {
@@ -27,18 +25,19 @@ flatpickr(dateImportEl, {
             buttomStartEl.disabled = false;
             buttomStartEl.addEventListener('click', () => {
 
-                const selectedDate = flatpickr.parseDate(dateImportEl.value);
-
                 const timerId = setInterval(() => {
-                    const deltaTime = selectedDate.getTime() - Date.now();
+                    const deltaTime = selectedDates[0] - Date.now();
 
                     if (deltaTime <= 0) {
                         clearInterval(timerId);
+                        Notiflix.Notify.failure('Time out!');
                     } else {
-                        dateDaysEl.textContent = pad(convertMs(deltaTime).days);
-                        dateHoursEl.textContent = pad(convertMs(deltaTime).hours);
-                        dataMinutesEl.textContent = pad(convertMs(deltaTime).minutes);
-                        dataSecondsEl.textContent = pad(convertMs(deltaTime).seconds);
+                        const finalTime = convertMs(deltaTime);
+
+                        dateDaysEl.textContent = finalTime.days;
+                        dateHoursEl.textContent = finalTime.hours;
+                        dataMinutesEl.textContent = finalTime.minutes;
+                        dataSecondsEl.textContent = finalTime.seconds;
                     }
                 }, 1000)
             });
@@ -46,7 +45,8 @@ flatpickr(dateImportEl, {
     },
 });
 
-function convertMs(deltaTime) {
+
+function convertMs(ms) {
     // Number of milliseconds per unit of time
     const second = 1000;
     const minute = second * 60;
@@ -54,13 +54,13 @@ function convertMs(deltaTime) {
     const day = hour * 24;
 
     // Remaining days
-    const days = Math.floor(deltaTime / day);
+    const days = pad(Math.floor(ms / day));
     // Remaining hours
-    const hours = Math.floor((deltaTime % day) / hour);
+    const hours = pad(Math.floor((ms % day) / hour));
     // Remaining minutes
-    const minutes = Math.floor(((deltaTime % day) % hour) / minute);
+    const minutes = pad(Math.floor(((ms % day) % hour) / minute));
     // Remaining seconds
-    const seconds = Math.floor((((deltaTime % day) % hour) % minute) / second);
+    const seconds = pad(Math.floor((((ms % day) % hour) % minute) / second));
 
     return { days, hours, minutes, seconds };
 

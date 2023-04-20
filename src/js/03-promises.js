@@ -1,10 +1,12 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
 const formEl = document.querySelector('.form');
+const submitButton = formEl.querySelector('button[type="submit"]');
 formEl.addEventListener('submit', onFormSubmit);
 
 function onFormSubmit(event) {
     event.preventDefault();
+    submitButton.disabled = true;
     const data = {};
 
     new FormData(formEl).forEach((value, name) => (data[name] = value));
@@ -14,8 +16,9 @@ function onFormSubmit(event) {
     if (Number(data.amount) <= 0 || Number(data.step) < 0 || Number(data.delay) < 0) {
         Notify.failure(`❌ Invalid range entered`);
     } else {
+        const promises = [];
         for (let i = 1; i <= Number(data.amount); i += 1) {
-            createPromise(i, delayCounter)
+            const promise = createPromise(i, delayCounter)
                 .then(({ position, delay }) => {
                     Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`);
                 })
@@ -23,12 +26,16 @@ function onFormSubmit(event) {
                     Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`);
                 });
 
+            promises.push(promise);
             delayCounter += Number(data.step);
         }
+
+        Promise.all(promises).finally(() => {
+            submitButton.disabled = false;
+        })
     }
 }
 
-console.dir(formEl);
 
 function createPromise(position, delay) {
     const shouldResolve = Math.random() > 0.3;

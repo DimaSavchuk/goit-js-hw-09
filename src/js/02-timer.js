@@ -24,13 +24,15 @@ flatpickr(dateImportEl, {
         } else {
             buttomStartEl.disabled = false;
             buttomStartEl.addEventListener('click', () => {
-
+                dateImportEl.disabled = true;
                 const timerId = setInterval(() => {
                     const deltaTime = selectedDates[0] - Date.now();
 
                     if (deltaTime <= 0) {
                         clearInterval(timerId);
-                        Notiflix.Notify.failure('Time out!');
+                        Notiflix.Notify.success('Time out!');
+                        dateImportEl.disabled = false;
+                        buttomStartEl.disabled = true;
                     } else {
                         const finalTime = convertMs(deltaTime);
 

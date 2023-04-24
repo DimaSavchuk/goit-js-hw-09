@@ -24,6 +24,7 @@ flatpickr(dateImportEl, {
         } else {
             buttomStartEl.disabled = false;
             buttomStartEl.addEventListener('click', () => {
+                buttomStartEl.disabled = true;
                 dateImportEl.disabled = true;
                 const timerId = setInterval(() => {
                     const deltaTime = selectedDates[0] - Date.now();
